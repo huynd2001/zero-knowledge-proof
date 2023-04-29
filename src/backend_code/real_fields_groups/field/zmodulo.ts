@@ -1,34 +1,48 @@
 import { Field, FieldElement } from "../../group_theory/field";
 
-class ZModuloPElement extends FieldElement<number> {
-  constructor(value: number, field: ZModuloP) {
+class ZModuloPElement extends FieldElement<bigint> {
+  constructor(value: bigint, field: ZModuloP) {
     super(value, field);
   }
 
-  equals = (other: FieldElement<number>) => {
-    return this.getValue() == other.getValue();
+  equals = (other: FieldElement<bigint>) => {
+    return this.getValue() === other.getValue();
   };
 }
 
-class ZModuloP extends Field<number> {
+class ZModuloP extends Field<bigint> {
   /**
    * @param p The prime number to use as the modulus
    * @private
    */
-  private readonly p: number;
-  constructor(p: number) {
+  private readonly p: bigint;
+
+  constructor(p: bigint) {
     super(`ZModuloP(${p})`);
     this.p = p;
   }
 
-  private static modulo = (a: number, p: number) => {
+  private static modulo = (a: bigint, p: bigint) => {
     return ((a % p) + p) % p;
   };
 
+  private static powModulo = (a: bigint, b: bigint, p: bigint) => {
+    if (b == 0n) {
+      return 1n;
+    } else {
+      let c: bigint = ZModuloP.powModulo(a, b / 2n, p);
+      if (b % 2n === 0n) {
+        return ZModuloP.modulo(c * c, p);
+      } else {
+        return ZModuloP.modulo(c * c * a, p);
+      }
+    }
+  };
+
   add = (
-    a: FieldElement<number>,
-    b: FieldElement<number>
-  ): FieldElement<number> => {
+    a: FieldElement<bigint>,
+    b: FieldElement<bigint>
+  ): FieldElement<bigint> => {
     if (a.getField() !== b.getField()) {
       throw new Error("Fields must be the same to add");
     }
@@ -42,35 +56,22 @@ class ZModuloP extends Field<number> {
     );
   };
 
-  addId = (): FieldElement<number> => {
-    return new ZModuloPElement(0, this);
+  addId = (): FieldElement<bigint> => {
+    return new ZModuloPElement(0n, this);
   };
 
-  private static powModulo = (a: number, b: number, p: number) => {
-    if (b == 0) {
-      return 1;
-    } else {
-      let c = ZModuloP.powModulo(a, Math.floor(b / 2), p);
-      if (b % 2 == 0) {
-        return ZModuloP.modulo(c * c, p);
-      } else {
-        return ZModuloP.modulo(c * c * a, p);
-      }
-    }
-  };
-
-  inv = (a: FieldElement<number>): FieldElement<number> => {
+  inv = (a: FieldElement<bigint>): FieldElement<bigint> => {
     let a_value = a.getValue();
     return new ZModuloPElement(
-      ZModuloP.powModulo(a_value, this.p - 2, this.p),
+      ZModuloP.powModulo(a_value, this.p - 2n, this.p),
       this
     );
   };
 
   mul = (
-    a: FieldElement<number>,
-    b: FieldElement<number>
-  ): FieldElement<number> => {
+    a: FieldElement<bigint>,
+    b: FieldElement<bigint>
+  ): FieldElement<bigint> => {
     if (a.getField() !== b.getField()) {
       throw new Error("Fields must be the same to add");
     }
@@ -84,15 +85,15 @@ class ZModuloP extends Field<number> {
     );
   };
 
-  mulId = (): FieldElement<number> => {
-    return new ZModuloPElement(1, this);
+  mulId = (): FieldElement<bigint> => {
+    return new ZModuloPElement(1n, this);
   };
 
-  neg = (a: FieldElement<number>): FieldElement<number> => {
+  neg = (a: FieldElement<bigint>): FieldElement<bigint> => {
     return new ZModuloPElement(ZModuloP.modulo(-a.getValue(), this.p), this);
   };
 
-  newElement = (value: number): FieldElement<number> => {
+  newElement = (value: bigint): FieldElement<bigint> => {
     return new ZModuloPElement(value, this);
   };
 

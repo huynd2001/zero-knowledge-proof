@@ -2,11 +2,11 @@ import { Field, FieldElement } from "../../group_theory/field";
 import { Group, GroupElement } from "../../group_theory/group";
 
 class PointPairing<R> {
-  public readonly x: R;
-  public readonly y: R;
+  public readonly x: R | undefined;
+  public readonly y: R | undefined;
   public infinity: boolean;
 
-  constructor(infinity: boolean, x: R, y: R) {
+  constructor(infinity: boolean, x?: R, y?: R) {
     this.x = x;
     this.y = y;
     this.infinity = infinity;
@@ -25,10 +25,11 @@ class PointPairing<R> {
  * An elliptic curve point is a point on an elliptic curve. It is represented by
  * a pair of elements in a field R, or a point at infinity.
  */
-class EllipticCurvePoint<T extends FieldElement<R>, R> extends GroupElement<
-  PointPairing<R>
-> {
-  constructor(infinity: boolean, x: R, y: R, curve: EllipticCurve<T, R>) {
+class EllipticCurvePoint<
+  T extends FieldElement<R>,
+  R extends { toString(): string }
+> extends GroupElement<PointPairing<R>> {
+  constructor(infinity: boolean, curve: EllipticCurve<T, R>, x?: R, y?: R) {
     super(new PointPairing<R>(infinity, x, y), curve);
   }
 
@@ -41,9 +42,10 @@ class EllipticCurvePoint<T extends FieldElement<R>, R> extends GroupElement<
   };
 }
 
-class EllipticCurve<T extends FieldElement<R>, R> extends Group<
-  PointPairing<R>
-> {
+class EllipticCurve<
+  T extends FieldElement<R>,
+  R extends { toString(): string }
+> extends Group<PointPairing<R>> {
   public readonly a: T;
   public readonly b: T;
   public readonly field: Field<R>;
@@ -67,12 +69,14 @@ class EllipticCurve<T extends FieldElement<R>, R> extends Group<
     q: GroupElement<PointPairing<R>>
   ): GroupElement<PointPairing<R>> => {
     // TODO: check if everyone's field is consistent
+    if (p === this.id()) return q;
+    if (q === this.id()) return p;
     const f = this.field;
-    const x_1 = f.newElement(p.getValue().x);
-    const y_1 = f.newElement(p.getValue().y);
-    const x_2 = f.newElement(q.getValue().x);
-    const y_2 = f.newElement(q.getValue().y);
-    let muy: FieldElement<R> = undefined;
+    const x_1 = f.newElement(p.getValue().x as R);
+    const y_1 = f.newElement(p.getValue().y as R);
+    const x_2 = f.newElement(q.getValue().x as R);
+    const y_2 = f.newElement(q.getValue().y as R);
+    let muy = undefined;
 
     if (f.sub(x_1, x_2).equals(f.addId())) {
       if (y_1.equals(f.addId())) {
@@ -91,26 +95,28 @@ class EllipticCurve<T extends FieldElement<R>, R> extends Group<
     }
     const x_3 = f.sub(f.sub(f.mul(muy, muy), x_1), x_2);
     const y_3 = f.sub(f.mul(muy, f.sub(x_1, x_3)), y_1);
-    return new EllipticCurvePoint(false, x_3.getValue(), y_3.getValue(), this);
+    return new EllipticCurvePoint(false, this, x_3.getValue(), y_3.getValue());
   };
 
   id = (): GroupElement<PointPairing<R>> => {
-    return new EllipticCurvePoint(true, undefined, undefined, this);
+    return new EllipticCurvePoint(true, this);
   };
 
   neg = (p: GroupElement<PointPairing<R>>): GroupElement<PointPairing<R>> => {
+    if (p === this.id()) return this.id();
     return new EllipticCurvePoint(
       false,
-      p.getValue().x,
-      this.field.neg(this.field.newElement(p.getValue().y)).getValue(),
-      this
+      this,
+      p.getValue().x as R,
+      this.field.neg(this.field.newElement(p.getValue().y as R)).getValue()
     );
   };
 
   elementBelongToGroup = (value: EllipticCurvePoint<T, R>): boolean => {
+    if (value === this.id()) return true;
     const f = this.field;
-    const x = f.newElement(value.getValue().x);
-    const y = f.newElement(value.getValue().y);
+    const x = f.newElement(value.getValue().x as R);
+    const y = f.newElement(value.getValue().y as R);
     const left = f.mul(y, y);
     const right = f.add(
       f.add(f.mul(f.mul(x, x), x), f.mul(f.mul(this.a, x), x)),

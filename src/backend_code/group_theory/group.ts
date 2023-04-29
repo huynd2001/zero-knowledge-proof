@@ -1,6 +1,5 @@
-import { FieldElement } from "./field";
-
-abstract class GroupElement<T> {
+abstract class GroupElement<T extends { toString(): string }> {
+  abstract equals: (other: GroupElement<T>) => boolean;
   protected value: T;
   protected field: Group<T>;
 
@@ -17,14 +16,16 @@ abstract class GroupElement<T> {
     return this.field;
   };
 
-  abstract equals: (other: GroupElement<T>) => boolean;
-
   toString = (): string => {
     return this.value.toString();
   };
 }
 
-abstract class Group<T> {
+abstract class Group<T extends { toString(): string }> {
+  abstract add: (a: GroupElement<T>, b: GroupElement<T>) => GroupElement<T>;
+  abstract neg: (a: GroupElement<T>) => GroupElement<T>;
+  abstract id: () => GroupElement<T>;
+  abstract elementBelongToGroup: (value: GroupElement<T>) => boolean;
   protected name: string;
 
   protected constructor(name: string) {
@@ -34,10 +35,6 @@ abstract class Group<T> {
   getName: () => string = () => {
     return this.name;
   };
-
-  abstract add: (a: GroupElement<T>, b: GroupElement<T>) => GroupElement<T>;
-
-  abstract neg: (a: GroupElement<T>) => GroupElement<T>;
 
   quickMultiply = (a: GroupElement<T>, b: number): GroupElement<T> => {
     if (b === 0) {
@@ -56,13 +53,9 @@ abstract class Group<T> {
     return this.add(a, this.neg(b));
   };
 
-  abstract id: () => GroupElement<T>;
-
   toString = (): string => {
     return this.getName();
   };
-
-  abstract elementBelongToGroup: (value: GroupElement<T>) => boolean;
 }
 
 export { Group, GroupElement };

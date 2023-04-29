@@ -1,4 +1,5 @@
-abstract class FieldElement<T> {
+abstract class FieldElement<T extends { toString(): string }> {
+  abstract equals: (other: FieldElement<T>) => boolean;
   protected value: T;
   protected field: Field<T>;
 
@@ -15,14 +16,20 @@ abstract class FieldElement<T> {
     return this.field;
   };
 
-  abstract equals: (other: FieldElement<T>) => boolean;
-
   toString = () => {
     return this.value.toString();
   };
 }
 
-abstract class Field<T> {
+abstract class Field<T extends { toString(): string }> {
+  abstract add: (a: FieldElement<T>, b: FieldElement<T>) => FieldElement<T>;
+  abstract mul: (a: FieldElement<T>, b: FieldElement<T>) => FieldElement<T>;
+  abstract neg: (a: FieldElement<T>) => FieldElement<T>;
+  abstract inv: (a: FieldElement<T>) => FieldElement<T>;
+  abstract addId: () => FieldElement<T>;
+  abstract mulId: () => FieldElement<T>;
+  abstract newElement: (value: T) => FieldElement<T>;
+  abstract elementBelongToField: (a: FieldElement<T>) => boolean;
   protected name: string;
 
   protected constructor(name: string) {
@@ -32,14 +39,6 @@ abstract class Field<T> {
   getName: () => string = () => {
     return this.name;
   };
-
-  abstract add: (a: FieldElement<T>, b: FieldElement<T>) => FieldElement<T>;
-
-  abstract mul: (a: FieldElement<T>, b: FieldElement<T>) => FieldElement<T>;
-
-  abstract neg: (a: FieldElement<T>) => FieldElement<T>;
-
-  abstract inv: (a: FieldElement<T>) => FieldElement<T>;
 
   sub = (a: FieldElement<T>, b: FieldElement<T>): FieldElement<T> => {
     return this.add(a, this.neg(b));
@@ -75,17 +74,9 @@ abstract class Field<T> {
     }
   };
 
-  abstract addId: () => FieldElement<T>;
-
-  abstract mulId: () => FieldElement<T>;
-
-  abstract newElement: (value: T) => FieldElement<T>;
-
   toString = (): string => {
     return this.getName();
   };
-
-  abstract elementBelongToField: (a: FieldElement<T>) => boolean;
 }
 
 export { Field, FieldElement };
