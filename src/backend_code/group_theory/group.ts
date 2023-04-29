@@ -36,12 +36,12 @@ abstract class Group<T extends { toString(): string }> {
     return this.name;
   };
 
-  quickMultiply = (a: GroupElement<T>, b: number): GroupElement<T> => {
-    if (b === 0) {
+  quickMultiply = (a: GroupElement<T>, b: bigint): GroupElement<T> => {
+    if (b === 0n) {
       return this.id();
     } else {
-      const half = this.quickMultiply(a, Math.floor(b / 2));
-      if (b % 2 === 0) {
+      const half = this.quickMultiply(a, b / 2n);
+      if (b % 2n === 0n) {
         return this.add(half, half);
       } else {
         return this.add(this.add(half, half), a);

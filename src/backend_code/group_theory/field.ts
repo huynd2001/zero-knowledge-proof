@@ -48,12 +48,12 @@ abstract class Field<T extends { toString(): string }> {
     return this.mul(a, this.inv(b));
   };
 
-  quickMultiply = (a: FieldElement<T>, b: number): FieldElement<T> => {
-    if (b === 0) {
+  quickMultiply = (a: FieldElement<T>, b: bigint): FieldElement<T> => {
+    if (b === 0n) {
       return this.addId();
     } else {
-      const half = this.quickMultiply(a, Math.floor(b / 2));
-      if (b % 2 === 0) {
+      const half = this.quickMultiply(a, b / 2n);
+      if (b % 2n === 0n) {
         return this.add(half, half);
       } else {
         return this.add(this.add(half, half), a);
@@ -61,12 +61,12 @@ abstract class Field<T extends { toString(): string }> {
     }
   };
 
-  quickPower = (a: FieldElement<T>, b: number): FieldElement<T> => {
-    if (b === 0) {
+  quickPower = (a: FieldElement<T>, b: bigint): FieldElement<T> => {
+    if (b === 0n) {
       return this.mulId();
     } else {
-      const half = this.quickPower(a, Math.floor(b / 2));
-      if (b % 2 === 0) {
+      const half = this.quickPower(a, b / 2n);
+      if (b % 2n === 0n) {
         return this.mul(half, half);
       } else {
         return this.mul(this.mul(half, half), a);

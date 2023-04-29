@@ -5,24 +5,24 @@ import {
 } from "../real_fields_groups/group/elliptic_curve";
 
 const run = () => {
-  const Z13field = new ZModuloP(13);
+  const Z13field = new ZModuloP(13n);
 
   const EC_Z13 = new EllipticCurve(
-    new ZModuloPElement(3, Z13field),
-    new ZModuloPElement(8, Z13field),
+    new ZModuloPElement(3n, Z13field),
+    new ZModuloPElement(8n, Z13field),
     Z13field
   );
 
   const EC_Z13_Points = [
-    new EllipticCurvePoint(true, undefined, undefined, EC_Z13),
-    new EllipticCurvePoint(false, 1, 5, EC_Z13),
-    new EllipticCurvePoint(false, 1, 8, EC_Z13),
-    new EllipticCurvePoint(false, 2, 3, EC_Z13),
-    new EllipticCurvePoint(false, 2, 10, EC_Z13),
-    new EllipticCurvePoint(false, 9, 6, EC_Z13),
-    new EllipticCurvePoint(false, 9, 7, EC_Z13),
-    new EllipticCurvePoint(false, 12, 2, EC_Z13),
-    new EllipticCurvePoint(false, 12, 11, EC_Z13),
+    new EllipticCurvePoint(true, EC_Z13),
+    new EllipticCurvePoint(false, EC_Z13, 1n, 5n),
+    new EllipticCurvePoint(false, EC_Z13, 1n, 8n),
+    new EllipticCurvePoint(false, EC_Z13, 2n, 3n),
+    new EllipticCurvePoint(false, EC_Z13, 2n, 10n),
+    new EllipticCurvePoint(false, EC_Z13, 9n, 6n),
+    new EllipticCurvePoint(false, EC_Z13, 9n, 7n),
+    new EllipticCurvePoint(false, EC_Z13, 12n, 2n),
+    new EllipticCurvePoint(false, EC_Z13, 12n, 11n),
   ];
 
   const EC_Z13_P = EC_Z13_Points[2];
