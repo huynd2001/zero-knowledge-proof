@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <Container>
       <Typography variant="h4" component="h1" gutterBottom>
-        Home Page
+        Zero Knowledge Proof Example
       </Typography>
     </Container>
   );
