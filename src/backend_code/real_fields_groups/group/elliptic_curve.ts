@@ -35,9 +35,10 @@ class EllipticCurvePoint<
 
   equals = (other: GroupElement<PointPairing<R>>): boolean => {
     return (
-      super.getValue().infinity === other.getValue().infinity &&
-      super.getValue().x === other.getValue().x &&
-      super.getValue().y === other.getValue().y
+      this.getValue().infinity === other.getValue().infinity &&
+      this.getValue().x === other.getValue().x &&
+      this.getValue().y === other.getValue().y &&
+      this.getGroup() === other.getGroup()
     );
   };
 }
@@ -69,23 +70,28 @@ class EllipticCurve<
     q: GroupElement<PointPairing<R>>
   ): GroupElement<PointPairing<R>> => {
     // TODO: check if everyone's field is consistent
-    if (p === this.id()) return q;
-    if (q === this.id()) return p;
+
     const f = this.field;
+
+    if (p.equals(this.id())) return this.newElement(q.getValue());
+    if (q.equals(this.id())) return this.newElement(p.getValue());
+
     const x_1 = f.newElement(p.getValue().x as R);
     const y_1 = f.newElement(p.getValue().y as R);
     const x_2 = f.newElement(q.getValue().x as R);
     const y_2 = f.newElement(q.getValue().y as R);
     let muy = undefined;
 
-    if (f.sub(x_1, x_2).equals(f.addId())) {
-      if (y_1.equals(f.addId())) {
+    if (x_1.equals(x_2)) {
+      if (!y_1.equals(y_2)) {
         // Infinity point
         return this.id();
       } else {
         // muy = (3x_1^2 + a) / (2y_1)
+        // When y_1 = 0, this means the curve is singular
+        if (y_1.equals(y_1.getField().addId())) return this.id();
         const x_1_sq = f.mul(x_1, x_1);
-        const numerator = f.add(f.add(x_1_sq, x_1_sq), f.add(x_1_sq, this.b));
+        const numerator = f.add(f.add(x_1_sq, x_1_sq), f.add(x_1_sq, this.a));
         const denominator = f.add(y_1, y_1);
         muy = f.div(numerator, denominator);
       }
@@ -103,7 +109,7 @@ class EllipticCurve<
   };
 
   neg = (p: GroupElement<PointPairing<R>>): GroupElement<PointPairing<R>> => {
-    if (p === this.id()) return this.id();
+    if (p.equals(this.id())) return this.id();
     return new EllipticCurvePoint(
       false,
       this,
@@ -113,7 +119,7 @@ class EllipticCurve<
   };
 
   elementBelongToGroup = (value: EllipticCurvePoint<T, R>): boolean => {
-    if (value === this.id()) return true;
+    if (value.equals(this.id())) return true;
     const f = this.field;
     const x = f.newElement(value.getValue().x as R);
     const y = f.newElement(value.getValue().y as R);
@@ -123,6 +129,15 @@ class EllipticCurve<
       this.b
     );
     return left.equals(right);
+  };
+
+  newElement = (value: PointPairing<R>): GroupElement<PointPairing<R>> => {
+    return new EllipticCurvePoint(
+      value.infinity,
+      this,
+      value.x as R,
+      value.y as R
+    );
   };
 }
 

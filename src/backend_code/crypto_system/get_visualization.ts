@@ -7,6 +7,7 @@ import {
   EllipticCurvePoint,
 } from "@/backend_code/real_fields_groups/group/elliptic_curve";
 import {
+  convertECP2BIP,
   getGeneratorOfEllipticCurveGroup,
   getOrderOfEllipticCurveGroup,
   hashString2BigInt,
@@ -14,12 +15,12 @@ import {
   randomBigInt,
 } from "@/backend_code/crypto_system/util";
 
-function getVerifierProverProtocolExample(
+export function getVerifierProverProtocolExample(
   p: bigint,
   a: bigint,
   b: bigint,
   order?: bigint
-) {
+): VP_Response {
   let ZP = new ZModuloP(p);
   let curve = new EllipticCurve(
     new ZModuloPElement(a, ZP),
@@ -50,7 +51,19 @@ function getVerifierProverProtocolExample(
   const sG = curve.quickMultiply(G, s);
   const cA = curve.quickMultiply(A, c);
   const R_plus_cA = curve.add(R, cA);
-  return { G, A, R, c, s, sG, R_plus_cA };
+  return {
+    p,
+    a,
+    b,
+    n,
+    G: convertECP2BIP(G),
+    A: convertECP2BIP(A),
+    R: convertECP2BIP(R),
+    c,
+    s,
+    sG: convertECP2BIP(sG),
+    R_plus_cA: convertECP2BIP(R_plus_cA),
+  };
 }
 
 function getProverDigitalSignatureExample(
@@ -59,7 +72,7 @@ function getProverDigitalSignatureExample(
   b: bigint,
   message: string,
   order?: bigint
-) {
+): DS_Response {
   let ZP = new ZModuloP(p);
   let curve = new EllipticCurve(
     new ZModuloPElement(a, ZP),
@@ -105,5 +118,24 @@ function getProverDigitalSignatureExample(
   const c_p_aM = curve.quickMultiply(p_aM, c);
   const R_plus_c_p_aM = curve.add(R, c_p_aM);
 
-  return { G, A, M, signature, sG, R_plus_cA, sM, R_plus_c_p_aM };
+  return {
+    p,
+    a,
+    b,
+    n,
+    G: convertECP2BIP(G),
+    A: convertECP2BIP(A),
+    M: convertECP2BIP(M),
+    c,
+    signature: {
+      s,
+      p_aM: convertECP2BIP(p_aM),
+      rM: convertECP2BIP(rM),
+      R: convertECP2BIP(R),
+    },
+    sG: convertECP2BIP(sG),
+    R_plus_cA: convertECP2BIP(R_plus_cA),
+    sM: convertECP2BIP(sM),
+    R_plus_c_p_aM: convertECP2BIP(R_plus_c_p_aM),
+  };
 }

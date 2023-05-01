@@ -26,6 +26,7 @@ abstract class Group<T extends { toString(): string }> {
   abstract neg: (a: GroupElement<T>) => GroupElement<T>;
   abstract id: () => GroupElement<T>;
   abstract elementBelongToGroup: (value: GroupElement<T>) => boolean;
+  abstract newElement: (value: T) => GroupElement<T>;
   protected name: string;
 
   protected constructor(name: string) {
