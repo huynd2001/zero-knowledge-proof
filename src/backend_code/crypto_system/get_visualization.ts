@@ -66,7 +66,7 @@ export function getVerifierProverProtocolExample(
   };
 }
 
-function getProverDigitalSignatureExample(
+export function getProverDigitalSignatureExample(
   p: bigint,
   a: bigint,
   b: bigint,

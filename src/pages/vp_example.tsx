@@ -56,7 +56,6 @@ export default function Home() {
 
     const { p, a, b, n, c, s } = vpSession;
 
-    // @ts-ignore
     const G = p2s(vpSession.G);
     const A = p2s(vpSession.A);
     const R = p2s(vpSession.R);
@@ -76,7 +75,7 @@ export default function Home() {
           {`Step 1: Peggy chooses a random value r, and computes R = rG = ${R}, sending R to Victor`}
         </Typography>
         <Typography variant="body1" gutterBottom>
-          {`Step 2: Victor computes c = H(G, A, R) = H(${G}, ${A}, ${R}) = ${c}, sending c to Peggy`}
+          {`Step 2: Victor computes c = H(G, A, R) = ${c}, sending c to Peggy`}
         </Typography>
         <Typography variant="body1" gutterBottom>
           {`Step 3: Peggy computes s = r + c * p_a = ${s}, sending s to Victor`}

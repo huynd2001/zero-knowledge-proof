@@ -20,6 +20,9 @@ type VPExample = {
 };
 
 type DSExample = {
+  p: string;
+  a: string;
+  b: string;
   G: Point;
   A: Point;
   M: Point;
