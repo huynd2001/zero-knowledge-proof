@@ -226,7 +226,7 @@ export function convertDSResponseToString(
     sG,
     R_plus_cA,
     sM,
-    R_plus_c_p_aM,
+    rM_plus_c_p_aM,
     n,
   } = response;
   return {
@@ -246,7 +246,7 @@ export function convertDSResponseToString(
     sG: bigintPointToStringPoint(sG),
     R_plus_cA: bigintPointToStringPoint(R_plus_cA),
     sM: bigintPointToStringPoint(sM),
-    R_plus_c_p_aM: bigintPointToStringPoint(R_plus_c_p_aM),
+    rM_plus_c_p_aM: bigintPointToStringPoint(rM_plus_c_p_aM),
     n: n.toString(),
   };
 }

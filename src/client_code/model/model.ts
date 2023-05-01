@@ -31,6 +31,6 @@ type DSExample = {
   sG: Point;
   R_plus_cA: Point;
   sM: Point;
-  R_plus_c_p_aM: Point;
+  rM_plus_c_p_aM: Point;
   n: string;
 };

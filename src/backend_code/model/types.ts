@@ -38,7 +38,7 @@ type DS_Response = {
   sG: BigIntPoint;
   R_plus_cA: BigIntPoint;
   sM: BigIntPoint;
-  R_plus_c_p_aM: BigIntPoint;
+  rM_plus_c_p_aM: BigIntPoint;
   n: bigint;
 };
 
@@ -68,6 +68,6 @@ type DS_str_Response = {
   sG: StrPoint;
   R_plus_cA: StrPoint;
   sM: StrPoint;
-  R_plus_c_p_aM: StrPoint;
+  rM_plus_c_p_aM: StrPoint;
   n: string;
 };

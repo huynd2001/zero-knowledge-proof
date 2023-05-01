@@ -66,7 +66,7 @@ export default function Home() {
     const sG = p2s(dsSession.sG);
     const R_plus_cA = p2s(dsSession.R_plus_cA);
     const sM = p2s(dsSession.sM);
-    const R_plus_c_p_aM = p2s(dsSession.R_plus_c_p_aM);
+    const rM_plus_c_p_aM = p2s(dsSession.rM_plus_c_p_aM);
 
     const signature = dsSession.signature;
     const s = signature.s;
@@ -112,13 +112,13 @@ export default function Home() {
           {`R + cA = ${R} + ${c} * ${A} = ${R_plus_cA}`}
         </Typography>
         <Typography variant="body1" gutterBottom>
-          {`Step 7: Victor checks if sM = R + c * p_a * M:\n`}
+          {`Step 7: Victor checks if sM = rM + c * p_a * M:\n`}
         </Typography>
         <Typography variant="body1" gutterBottom>
           {`sM = ${s} * ${M} = ${sM}`}
         </Typography>
         <Typography variant="body1" gutterBottom>
-          {`R + c * (p_a * M) = ${R} + ${c} * ${p_aM} = ${R_plus_c_p_aM}`}
+          {`rM + c * (p_a * M) = ${rM} + ${c} * ${p_aM} = ${rM_plus_c_p_aM}`}
         </Typography>
       </>
     );

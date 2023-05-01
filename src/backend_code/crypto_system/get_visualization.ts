@@ -113,10 +113,10 @@ export function getProverDigitalSignatureExample(
   const cA = curve.quickMultiply(A, c);
   const R_plus_cA = curve.add(R, cA);
 
-  // Step 7: Verifier checks if sM = R + c * (p_aM)
+  // Step 7: Verifier checks if sM = rM + c * (p_aM)
   const sM = curve.quickMultiply(M, s);
   const c_p_aM = curve.quickMultiply(p_aM, c);
-  const R_plus_c_p_aM = curve.add(R, c_p_aM);
+  const rM_plus_c_p_aM = curve.add(rM, c_p_aM);
 
   return {
     p,
@@ -136,6 +136,6 @@ export function getProverDigitalSignatureExample(
     sG: convertECP2BIP(sG),
     R_plus_cA: convertECP2BIP(R_plus_cA),
     sM: convertECP2BIP(sM),
-    R_plus_c_p_aM: convertECP2BIP(R_plus_c_p_aM),
+    rM_plus_c_p_aM: convertECP2BIP(rM_plus_c_p_aM),
   };
 }
