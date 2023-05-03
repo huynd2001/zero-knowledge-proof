@@ -258,7 +258,7 @@ export function getECOrderBabyStepGiantStep(p: bigint, a: bigint, b: bigint) {
     return 2n * (p + 1n) - l * M2;
   }
   // No solution found???
-  return undefined;
+  return -1n;
 }
 
 function roundModulo(a: bigint, p: bigint) {
