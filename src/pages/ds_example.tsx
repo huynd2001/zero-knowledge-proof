@@ -29,6 +29,8 @@ export default function Home() {
   const [dsSession, setDsSession] = useState<DSExample | undefined>(undefined);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isWaiting, setIsWaiting] = useState<number>(0);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,24 +40,46 @@ export default function Home() {
     });
   };
 
-  const vp_example = async () => {
+  const ds_example = async () => {
     const { p, a, b, message } = formData;
     const response = await fetch(
       `/api/ds?p=${p}&a=${a}&b=${b}&message=${message}`
     );
     const data = await response.json();
-    console.log(data.result);
+    if (data.error) throw new Error(data.error);
     setDsSession(data.result);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    vp_example()
+
+    setIsWaiting((i) => i + 1);
+    setError(undefined);
+    setDsSession(undefined);
+
+    ds_example()
       .then(() => console.log("done"))
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+        setError(e.toString());
+      })
+      .finally(() => setIsWaiting((i) => i - 1));
   };
 
   const displaySteps = () => {
+    if (error) {
+      return (
+        <Typography variant="body1" gutterBottom>
+          {`Error: ${error}`}
+        </Typography>
+      );
+    }
+    if (isWaiting)
+      return (
+        <Typography variant="body1" gutterBottom>
+          {`Peggy and Victor is verifying very hard...`}
+        </Typography>
+      );
     if (!dsSession) return null;
 
     const { p, a, b, n, c } = dsSession;

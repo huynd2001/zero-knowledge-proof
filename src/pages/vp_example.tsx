@@ -27,6 +27,8 @@ export default function Home() {
   const [vpSession, setVpSession] = useState<VPExample | undefined>(undefined);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const [isWaiting, setIsWaiting] = useState<number>(0);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,18 +42,40 @@ export default function Home() {
     const { p, a, b } = formData;
     const response = await fetch(`/api/vp?p=${p}&a=${a}&b=${b}`);
     const data = await response.json();
-    console.log(data.result);
+    if (data.error) throw new Error(data.error);
     setVpSession(data.result);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    setIsWaiting((i) => i + 1);
+    setError(undefined);
+    setVpSession(undefined);
+
     vp_example()
       .then(() => console.log("done"))
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+        setError(e.toString());
+      })
+      .finally(() => setIsWaiting((i) => i - 1));
   };
 
   const displaySteps = () => {
+    if (error) {
+      return (
+        <Typography variant="body1" gutterBottom>
+          {`Error: ${error}`}
+        </Typography>
+      );
+    }
+    if (isWaiting)
+      return (
+        <Typography variant="body1" gutterBottom>
+          {`Peggy and Victor is verifying very hard...`}
+        </Typography>
+      );
     if (!vpSession) return null;
 
     const { p, a, b, n, c, s } = vpSession;

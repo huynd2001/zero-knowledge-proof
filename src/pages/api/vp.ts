@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getVerifierProverProtocolExample } from "@/backend_code/crypto_system/get_visualization";
-import { convertVPResponseToString } from "@/backend_code/crypto_system/util";
+import {
+  checkValidInput,
+  convertVPResponseToString,
+  isPrime,
+} from "@/backend_code/crypto_system/util";
 import run from "@/backend_code/examples/addition_elliptic_curve";
 
 interface ResponseData {
@@ -20,14 +24,17 @@ function checkIsSingular(p: bigint, a: bigint, b: bigint) {
   }
 }
 
+function checkIsPrime(p: bigint) {
+  if (!isPrime(p)) {
+    throw new Error(`p must be prime!`);
+  }
+}
+
 function getVPSession(query: { p: string; a: string; b: string }) {
   const p = BigInt(query.p);
   const a = BigInt(query.a);
   const b = BigInt(query.b);
-  checkIsNegative(p, "p");
-  checkIsNegative(a, "a");
-  checkIsNegative(b, "b");
-  checkIsSingular(p, a, b);
+  checkValidInput(p, a, b);
   return getVerifierProverProtocolExample(p, a, b);
 }
 
@@ -47,9 +54,9 @@ export default function handler(
       res.status(200).json({
         result: convertVPResponseToString(result),
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      res.status(400).json({ error: "Error" });
+      res.status(400).json({ error: error.message ?? "Unknown error" });
     }
   } else {
     res.setHeader("Allow", "GET");

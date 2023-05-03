@@ -9,11 +9,46 @@ import {
 } from "@/backend_code/real_fields_groups/field/zmodulo";
 import { GroupElement } from "@/backend_code/group_theory/group";
 
-export function isPrime(n: bigint) {
+function isPrimeNaive(n: bigint) {
   for (let i = 2n; i * i <= n; i++) {
     if (n % i === 0n) return false;
   }
   return n > 1n;
+}
+
+function isPrimeMillerRabin(n: bigint) {
+  // This function returns true if n is a "prime" number
+  // using Miller-Rabin primality test
+  // (https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test)
+  // and false otherwise.
+  // The function is deterministic for n < 10^18
+  // and is probabilistic for n >= 10^18.
+  const k = 3; // number of rounds
+  let s = 0n;
+  let d = n - 1n;
+  while (d % 2n === 0n) {
+    s++;
+    d /= 2n;
+  }
+  for (let i = 0; i < k; i++) {
+    let a = randomBigInt(n - 4n) + 2n;
+    if (gcdBigInt(a, n) > 1n) return false;
+    let x = quickPowBigInt(a, d, n);
+    for (let r = 0n; r < s; r++) {
+      let y = roundModulo(x * x, n);
+      if (y === 1n && x !== 1n && x !== n - 1n) {
+        return false;
+      }
+      x = y;
+    }
+    if (x !== 1n) return false;
+  }
+  return true;
+}
+
+export function isPrime(n: bigint) {
+  if (n >= 10n ** 6n) return isPrimeNaive(n);
+  else return isPrimeMillerRabin(n);
 }
 
 export function quickPowBigInt(a: bigint, b: bigint, p: bigint): bigint {
@@ -419,4 +454,49 @@ export function convertDSResponseToString(
     rM_plus_c_p_aM: bigintPointToStringPoint(rM_plus_c_p_aM),
     n: n.toString(),
   };
+}
+
+function checkIsNegative(value: bigint, varName: string) {
+  if (value < 0n) {
+    throw new Error(`Negative input for ${varName} is invalid!`);
+  }
+}
+
+function checkIsSingular(p: bigint, a: bigint, b: bigint) {
+  if ((4n * a ** 3n + 27n * b ** 2n) % p === 0n) {
+    throw new Error(`Singular curve is invalid!`);
+  }
+}
+
+function checkIsPrime(p: bigint) {
+  if (!isPrime(p)) {
+    throw new Error(`p must be prime!`);
+  }
+}
+
+function checkSmaller(a: bigint, p: bigint, varName: string) {
+  if (a >= p) {
+    throw new Error(`${varName} must be smaller than p!`);
+  }
+}
+
+function checkTooBigNumber(number: bigint, varName: string) {
+  if (number.toString().length > 20) {
+    throw new Error(
+      `${varName} is too big! Please enter number of less than 15 digits!`
+    );
+  }
+}
+
+export function checkValidInput(p: bigint, a: bigint, b: bigint) {
+  checkIsPrime(p);
+  checkIsNegative(p, "p");
+  checkIsNegative(a, "a");
+  checkIsNegative(b, "b");
+  checkIsSingular(p, a, b);
+  checkSmaller(a, p, "a");
+  checkSmaller(b, p, "b");
+  checkTooBigNumber(p, "p");
+  checkTooBigNumber(a, "a");
+  checkTooBigNumber(b, "b");
 }

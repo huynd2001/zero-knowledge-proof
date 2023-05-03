@@ -1,22 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getProverDigitalSignatureExample } from "@/backend_code/crypto_system/get_visualization";
-import { convertDSResponseToString } from "@/backend_code/crypto_system/util";
+import {
+  checkValidInput,
+  convertDSResponseToString,
+  isPrime,
+} from "@/backend_code/crypto_system/util";
 
 interface ResponseData {
   result?: DS_str_Response;
   error?: string;
-}
-
-function checkIsNegative(value: bigint, varName: string) {
-  if (value < 0n) {
-    throw new Error(`Negative input for ${varName} is invalid!`);
-  }
-}
-
-function checkIsSingular(p: bigint, a: bigint, b: bigint) {
-  if ((4n * a ** 3n + 27n * b ** 2n) % p === 0n) {
-    throw new Error(`Singular curve is invalid!`);
-  }
 }
 
 function getDsSession(query: {
@@ -29,10 +21,7 @@ function getDsSession(query: {
   const a = BigInt(query.a);
   const b = BigInt(query.b);
   const message = query.message;
-  checkIsNegative(p, "p");
-  checkIsNegative(a, "a");
-  checkIsNegative(b, "b");
-  checkIsSingular(p, a, b);
+  checkValidInput(p, a, b);
   return getProverDigitalSignatureExample(p, a, b, message);
 }
 
@@ -53,9 +42,9 @@ export default function handler(
       res.status(200).json({
         result: convertDSResponseToString(result),
       });
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      res.status(400).json({ error: "Error" });
+      res.status(400).json({ error: error.message ?? "Error" });
     }
   } else {
     res.setHeader("Allow", "GET");
