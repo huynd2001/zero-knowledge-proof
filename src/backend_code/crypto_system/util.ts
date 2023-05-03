@@ -23,7 +23,7 @@ function isPrimeMillerRabin(n: bigint) {
   // and false otherwise.
   // The function is deterministic for n < 10^18
   // and is probabilistic for n >= 10^18.
-  const k = 3; // number of rounds
+  const k = 50; // number of rounds
   let s = 0n;
   let d = n - 1n;
   while (d % 2n === 0n) {
